@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { Float, Html } from '@react-three/drei'
 import * as THREE from 'three'
 
-export default function FloatingSlab({ position = [0, 2, -3] }) {
+export default function FloatingSlab({ position = [0, 2, -3], onSlabClick }) {
   const [touched, setTouched] = useState(false)
   const meshRef = useRef()
   const materialRef = useRef()
@@ -20,6 +20,7 @@ export default function FloatingSlab({ position = [0, 2, -3] }) {
 
   const handleClick = () => {
     setTouched(true)
+    onSlabClick?.()
     setTimeout(() => setTouched(false), 3000)
   }
 
@@ -66,7 +67,7 @@ export default function FloatingSlab({ position = [0, 2, -3] }) {
               animation: 'fadeIn 0.3s ease',
             }}
           >
-            Hey, has tocado la losa
+            🎨 Activando estilo Gaudí...
           </div>
         </Html>
       )}
