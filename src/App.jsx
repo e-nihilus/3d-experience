@@ -114,8 +114,9 @@ export default function App() {
           position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)',
           zIndex: 20, background: '#e74c3c', color: '#fff',
           padding: '10px 24px', borderRadius: 8, fontSize: 14, fontFamily: 'sans-serif',
+          maxWidth: '90vw', textAlign: 'center',
         }}>
-          Error: Configura VITE_DECART_API_KEY en .env.local
+          {decart.errorMsg || 'Error desconocido'}
         </div>
       )}
 
