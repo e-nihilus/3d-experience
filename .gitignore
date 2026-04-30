@@ -1,7 +1,4 @@
 node_modules
-/dist
+dist
 ToDo.txt
 *.local
-.env
-.env.local
-/public
