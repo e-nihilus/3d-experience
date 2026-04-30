@@ -1,8 +1,14 @@
 import { useRef, useEffect, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
+import { useXRStore } from '@react-three/xr'
 import * as THREE from 'three'
 
 export default function DecartSkybox({ videoElement }) {
+  const xrStore = useXRStore()
+  const isXR = xrStore.getState().session != null
+
+  // Solo renderizar dentro de una sesión XR
+  if (!isXR) return null
   const meshRef = useRef()
   const [texture, setTexture] = useState(null)
 
