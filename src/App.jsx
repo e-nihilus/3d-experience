@@ -26,8 +26,38 @@ function createImageStream(src) {
   })
 }
 
-const GAUDI_PROMPT =
-  'Apply colorful Gaudí trencadís mosaic textures to all surfaces, keep the same buildings, streets and layout exactly as they are, only change colors and surface patterns'
+const GAUDI_PROMPT = `
+Transform only the architectural surfaces into Antoni Gaudí inspired Catalan modernism.
+
+Preserve EXACTLY:
+- original buildings
+- windows
+- doors
+- streets
+- camera position
+- geometry
+- perspective
+- city layout
+- object placement
+- people and vehicles
+
+Do NOT redesign the city.
+Do NOT generate fantasy buildings.
+Do NOT change shapes or structure.
+
+Apply only:
+- colorful trencadís ceramic mosaic textures
+- organic Gaudí surface ornamentation
+- flowing mosaic patterns
+- Mediterranean ceramic colors
+- subtle Casa Batlló and Park Güell inspired details
+- curved decorative surface accents
+
+Style references:
+Barcelona modernisme, Antoni Gaudí, Park Güell, Casa Batlló, ceramic mosaics, organic architecture.
+
+Keep the result realistic, coherent, cinematic and structurally identical to the original scene.
+`;
 
 export default function App() {
   const camera = useCameraStream()
