@@ -7,26 +7,7 @@ import useDecartStream from './hooks/useDecartStream'
 
 const store = createXRStore()
 
-function createImageStream(src) {
-  return new Promise((resolve) => {
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.onload = () => {
-      const canvas = document.createElement('canvas')
-      canvas.width = 1280
-      canvas.height = 720
-      const ctx = canvas.getContext('2d')
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-      // Repintar a 1fps para mantener el stream vivo
-      setInterval(() => ctx.drawImage(img, 0, 0, canvas.width, canvas.height), 1000)
-      resolve(canvas.captureStream(1))
-    }
-    img.onerror = () => resolve(null)
-    img.src = src
-  })
-}
-
-const GAUDI_PROMPT = `
+const VTON_PROMPT = `
 Transform only the architectural surfaces into Antoni Gaudí inspired Catalan modernism.
 
 Preserve EXACTLY:
@@ -57,7 +38,8 @@ Style references:
 Barcelona modernisme, Antoni Gaudí, Park Güell, Casa Batlló, ceramic mosaics, organic architecture.
 
 Keep the result realistic, coherent, cinematic and structurally identical to the original scene.
-`;
+`
+const REFERENCE_IMAGE_URL = 'https://v3b.fal.media/files/b/0a985506/y57_APcgGHlPxOOHIOqYO_15129.png'
 
 export default function App() {
   const camera = useCameraStream()
@@ -73,12 +55,10 @@ export default function App() {
     if (decart.active) {
       decart.stop()
     } else {
-      let stream = camera.streamRef.current
-      if (!stream) {
-        // Desktop sin cámara: crear stream desde la imagen de fondo
-        stream = await createImageStream('/barcelona.jpg')
-      }
-      if (stream) decart.start(stream, GAUDI_PROMPT)
+      // Ensure camera is started
+      if (!camera.available) await camera.start()
+      const videoEl = camera.videoRef.current
+      if (videoEl) decart.start(videoEl, VTON_PROMPT, REFERENCE_IMAGE_URL)
     }
   }
 
@@ -135,7 +115,7 @@ export default function App() {
           zIndex: 20, background: 'rgba(0,0,0,0.8)', color: '#fff',
           padding: '20px 40px', borderRadius: 12, fontSize: 18, fontFamily: 'sans-serif',
         }}>
-          Conectando con Decart AI...
+          Conectando con Lucy VTON...
         </div>
       )}
 
