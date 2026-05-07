@@ -5,6 +5,7 @@ import Scene from './Scene'
 import useCameraStream from './hooks/useCameraStream'
 import useExperienceComposer from './hooks/useExperienceComposer'
 import useFalRealtimeTryOn from './hooks/useFalRealtimeTryOn'
+import useGeofencing from './hooks/useGeofencing'
 import {
   TRY_ON_COMPOSER_FPS,
   TRY_ON_COMPOSER_MAX_WIDTH,
@@ -18,11 +19,12 @@ export default function App() {
   const camera = useCameraStream()
   const composer = useExperienceComposer()
   const tryOn = useFalRealtimeTryOn()
+  const { activeZone } = useGeofencing()
   const sceneCanvasRef = useRef(null)
   const fileInputRef = useRef(null)
   const [tryOnPrompt, setTryOnPrompt] = useState(TRY_ON_PROMPT)
-  const [referenceImageDataUri, setReferenceImageDataUri] = useState('')
-  const [referenceImageName, setReferenceImageName] = useState('Sin imagen')
+  const [referenceImageDataUri, setReferenceImageDataUri] = useState('https://www.santjordihostels.com/wp-content/uploads/must-see-gaudi-houses-in-barcelona-004-400x400.png')
+  const [referenceImageName, setReferenceImageName] = useState('Gaudí House (Default)')
 
   const { available, videoRef, start: startCamera } = camera
   const { start: startComposer, stop: stopComposer } = composer
@@ -363,6 +365,7 @@ export default function App() {
             showBackground={!available}
             slabActive={tryOnActive}
             slabStatus={status}
+            activeZone={activeZone}
           />
         </XR>
       </Canvas>

@@ -1,9 +1,29 @@
-import { Suspense } from 'react'
+import { Suspense, useRef } from 'react'
 import { OrbitControls, Environment, useTexture } from '@react-three/drei'
+import { useFrame, useThree } from '@react-three/fiber'
 import FloatingSlab from './components/FloatingSlab'
 import * as THREE from 'three'
 
-export default function Scene({ onSlabClick, showBackground, slabActive, slabStatus }) {
+const SLAB_DISTANCE = 3 // metros delante del usuario
+
+export default function Scene({ onSlabClick, showBackground, slabActive, slabStatus, activeZone }) {
+  const slabPositionRef = useRef([0, 2, -3])
+  const { camera } = useThree()
+  const direction = useRef(new THREE.Vector3())
+
+  useFrame(() => {
+    if (!activeZone) return
+
+    camera.getWorldDirection(direction.current)
+
+    // Colocar la baldosa a SLAB_DISTANCE metros delante de la cámara, a la misma altura
+    slabPositionRef.current = [
+      camera.position.x + direction.current.x * SLAB_DISTANCE,
+      camera.position.y,
+      camera.position.z + direction.current.z * SLAB_DISTANCE,
+    ]
+  })
+
   return (
     <>
       {/* Iluminación */}
@@ -23,13 +43,15 @@ export default function Scene({ onSlabClick, showBackground, slabActive, slabSta
       {/* Controles de cámara (desktop/mobile) */}
       <OrbitControls makeDefault />
 
-      {/* Cubo flotante */}
-      <FloatingSlab
-        position={[0, 2, -3]}
-        onSlabClick={onSlabClick}
-        active={slabActive}
-        status={slabStatus}
-      />
+      {/* Cubo flotante — solo visible dentro de una zona de geofencing */}
+      {activeZone && (
+        <FloatingSlab
+          positionRef={slabPositionRef}
+          onSlabClick={onSlabClick}
+          active={slabActive}
+          status={slabStatus}
+        />
+      )}
     </>
   )
 }
