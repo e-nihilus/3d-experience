@@ -5,4 +5,4 @@ export const TRY_ON_COMPOSER_MAX_WIDTH = 768
 export const TRY_ON_VIDEO_MAX_BITRATE = 650_000
 export const TRY_ON_ENHANCE_PROMPT = true
 
-export const TRY_ON_PROMPT = 'Change the buildings to look like gaudi style'
+export const TRY_ON_PROMPT = 'Transform the scene into Antoni Gaudí modernist architecture style with colorful ceramic mosaic trencadís, organic curved facades, and ornate wrought-iron balconies'

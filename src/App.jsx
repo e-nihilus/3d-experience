@@ -23,8 +23,23 @@ export default function App() {
   const sceneCanvasRef = useRef(null)
   const fileInputRef = useRef(null)
   const [tryOnPrompt, setTryOnPrompt] = useState(TRY_ON_PROMPT)
-  const [referenceImageDataUri, setReferenceImageDataUri] = useState('https://www.santjordihostels.com/wp-content/uploads/must-see-gaudi-houses-in-barcelona-004-400x400.png')
+  const [referenceImageDataUri, setReferenceImageDataUri] = useState('')
   const [referenceImageName, setReferenceImageName] = useState('Gaudí House (Default)')
+
+  useEffect(() => {
+    fetch('/gaudi.png')
+      .then((res) => res.blob())
+      .then((blob) => {
+        const reader = new FileReader()
+        reader.onload = () => {
+          if (typeof reader.result === 'string') {
+            setReferenceImageDataUri(reader.result)
+          }
+        }
+        reader.readAsDataURL(blob)
+      })
+      .catch(() => {})
+  }, [])
 
   const { available, videoRef, start: startCamera } = camera
   const { start: startComposer, stop: stopComposer } = composer
