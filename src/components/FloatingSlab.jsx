@@ -56,7 +56,7 @@ export default function FloatingSlab({ position, positionRef, onSlabClick, activ
       ? 'Pulsa para desactivar'
       : 'Pulsa para activar'
 
-  const initialPos = position || positionRef?.current || [0, 2, -3]
+  const initialPos = position || positionRef?.current || [0, 2, -12]
 
   return (
     <Float speed={2} rotationIntensity={0.15} floatIntensity={0.6}>
@@ -67,9 +67,9 @@ export default function FloatingSlab({ position, positionRef, onSlabClick, activ
         onPointerOver={() => { document.body.style.cursor = 'pointer' }}
         onPointerOut={() => { document.body.style.cursor = 'auto' }}
       >
-        <primitive object={scene} scale={2.5} />
+        <primitive object={scene} scale={1} />
 
-        <Html position={[0, -1.35, 0]} center>
+        <Html position={[0, -0.7, 0]} center>
           <div
             style={{
               background: 'rgba(0,0,0,0.65)',
@@ -89,7 +89,7 @@ export default function FloatingSlab({ position, positionRef, onSlabClick, activ
 
         {/* Mensaje al tocar */}
         {touched && (
-          <Html position={[0, 0.8, 0]} center>
+          <Html position={[0, 0.5, 0]} center>
             <div
               style={{
                 background: 'rgba(0,0,0,0.85)',
