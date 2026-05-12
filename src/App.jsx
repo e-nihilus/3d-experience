@@ -19,7 +19,7 @@ export default function App() {
   const camera = useCameraStream()
   const composer = useExperienceComposer()
   const tryOn = useFalRealtimeTryOn()
-  const { activeZone } = useGeofencing()
+  const { activeZone, userPosition } = useGeofencing()
   const sceneCanvasRef = useRef(null)
   const fileInputRef = useRef(null)
   const [tryOnPrompt, setTryOnPrompt] = useState(TRY_ON_PROMPT)
@@ -381,6 +381,7 @@ export default function App() {
             slabActive={tryOnActive}
             slabStatus={status}
             activeZone={activeZone}
+            userPosition={userPosition}
           />
         </XR>
       </Canvas>

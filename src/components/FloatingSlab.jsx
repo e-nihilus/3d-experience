@@ -3,16 +3,14 @@ import { useFrame } from '@react-three/fiber'
 import { Float, Html, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 
-export default function FloatingSlab({ position, positionRef, onSlabClick, active = false, status = 'idle' }) {
+export default function FloatingSlab({ position = [0, 1.5, -6], onSlabClick, active = false, status = 'idle' }) {
   const [touched, setTouched] = useState(false)
   const groupRef = useRef()
   const { scene } = useGLTF('/baldosa.glb')
 
-  // Animación suave de entrada (escala de 0 a 1) + rotación continua
   const scaleRef = useRef(0)
   const rotY = useRef(0)
 
-  // Configurar materiales del modelo para interactividad
   useEffect(() => {
     scene.traverse((child) => {
       if (child.isMesh) {
@@ -24,12 +22,6 @@ export default function FloatingSlab({ position, positionRef, onSlabClick, activ
 
   useFrame((_, delta) => {
     if (!groupRef.current) return
-
-    // Seguir la posición dinámica del ref si existe
-    if (positionRef?.current) {
-      const [x, y, z] = positionRef.current
-      groupRef.current.position.set(x, y, z)
-    }
 
     // Entrada suave
     if (scaleRef.current < 1) {
@@ -56,13 +48,11 @@ export default function FloatingSlab({ position, positionRef, onSlabClick, activ
       ? 'Pulsa para desactivar'
       : 'Pulsa para activar'
 
-  const initialPos = position || positionRef?.current || [0, 2, -12]
-
   return (
     <Float speed={2} rotationIntensity={0.15} floatIntensity={0.6}>
       <group
         ref={groupRef}
-        position={initialPos}
+        position={position}
         onClick={handleClick}
         onPointerOver={() => { document.body.style.cursor = 'pointer' }}
         onPointerOut={() => { document.body.style.cursor = 'auto' }}

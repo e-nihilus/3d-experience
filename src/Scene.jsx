@@ -1,52 +1,43 @@
-import { Suspense, useRef } from 'react'
+import { Suspense, useMemo } from 'react'
 import { OrbitControls, Environment, useTexture } from '@react-three/drei'
-import { useFrame, useThree } from '@react-three/fiber'
 import FloatingSlab from './components/FloatingSlab'
 import * as THREE from 'three'
 
-const SLAB_DISTANCE = 3 // metros delante del usuario
+const SLAB_HEIGHT = 2
+const DEG_TO_RAD = Math.PI / 180
+const METERS_PER_DEG_LAT = 111320
 
-export default function Scene({ onSlabClick, showBackground, slabActive, slabStatus, activeZone }) {
-  const slabPositionRef = useRef([0, 2, -3])
-  const { camera } = useThree()
-  const direction = useRef(new THREE.Vector3())
+function gpsOffsetToScene(userPos, zonePos) {
+  const cosLat = Math.cos(userPos.lat * DEG_TO_RAD)
+  const dx = (zonePos.lon - userPos.lon) * METERS_PER_DEG_LAT * cosLat
+  const dz = (zonePos.lat - userPos.lat) * METERS_PER_DEG_LAT
+  return [dx, SLAB_HEIGHT, -dz]
+}
 
-  useFrame(() => {
-    if (!activeZone) return
-
-    camera.getWorldDirection(direction.current)
-
-    // Colocar la baldosa a SLAB_DISTANCE metros delante de la cámara, a la misma altura
-    slabPositionRef.current = [
-      camera.position.x + direction.current.x * SLAB_DISTANCE,
-      camera.position.y,
-      camera.position.z + direction.current.z * SLAB_DISTANCE,
-    ]
-  })
+export default function Scene({ onSlabClick, showBackground, slabActive, slabStatus, activeZone, userPosition }) {
+  const slabPosition = useMemo(() => {
+    if (!activeZone || !userPosition) return null
+    return gpsOffsetToScene(userPosition, activeZone)
+  }, [activeZone, userPosition])
 
   return (
     <>
-      {/* Iluminación */}
       <ambientLight intensity={0.5} />
       <directionalLight position={[5, 8, 3]} intensity={1.2} castShadow />
 
-      {/* Entorno HDRI para reflejos */}
       <Environment preset="city" />
 
-      {/* Fondo 360 solo en desktop (sin camara) */}
       {showBackground && (
         <Suspense fallback={null}>
           <StreetBackground />
         </Suspense>
       )}
 
-      {/* Controles de cámara (desktop/mobile) */}
       <OrbitControls makeDefault />
 
-      {/* Cubo flotante — solo visible dentro de una zona de geofencing */}
-      {activeZone && (
+      {slabPosition && (
         <FloatingSlab
-          positionRef={slabPositionRef}
+          position={slabPosition}
           onSlabClick={onSlabClick}
           active={slabActive}
           status={slabStatus}
