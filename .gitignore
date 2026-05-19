@@ -5,3 +5,4 @@ ToDo.txt
 .env
 .env.*
 !.env.example
+/doc
