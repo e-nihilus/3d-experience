@@ -218,7 +218,7 @@ export default function App() {
         </div>
       )}
 
-      <div
+      {/* <div
         style={{
           position: 'fixed',
           left: 20,
@@ -330,7 +330,7 @@ export default function App() {
             Referencia: {referenceImageName}
           </span>
         </div>
-      </div>
+      </div> */}
 
       {/* Botones XR */}
       <div style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 30, display: 'flex', gap: 10 }}>
@@ -345,7 +345,7 @@ export default function App() {
             📷 Cámara
           </button>
         )}
-        <button
+        {/* <button
           onClick={() => store.enterAR().catch(() => alert('WebXR AR no soportado. Asegúrate de usar HTTPS.'))}
           style={{
             padding: '12px 24px', fontSize: '16px', background: '#2e6b1a',
@@ -362,7 +362,7 @@ export default function App() {
           }}
         >
           Enter VR
-        </button>
+        </button> */}
       </div>
 
       {/* Capa 3: Canvas 3D transparente encima */}
