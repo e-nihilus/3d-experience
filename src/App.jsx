@@ -13,7 +13,17 @@ import {
   TRY_ON_PROMPT,
 } from './config/tryOnConfig'
 
-const store = createXRStore()
+// Emulador WebXR (IWER + DevUI) que se inyecta automáticamente
+// cuando el navegador no soporta WebXR nativo (PC sin headset).
+// En Meta Quest 3 real, el runtime nativo tiene preferencia y el emulador no se carga.
+const store = createXRStore({
+  emulate: {
+    type: 'metaQuest3',
+    inject: true, // habilitar en cualquier hostname (no solo localhost)
+    // Sin entorno sintético: el office_small ocluye los objetos flotantes
+    syntheticEnvironment: false,
+  },
+})
 
 export default function App() {
   const camera = useCameraStream()
@@ -25,6 +35,17 @@ export default function App() {
   const [tryOnPrompt, setTryOnPrompt] = useState(TRY_ON_PROMPT)
   const [referenceImageDataUri, setReferenceImageDataUri] = useState('')
   const [referenceImageName, setReferenceImageName] = useState('Gaudí House (Default)')
+  const [collection, setCollection] = useState([])
+  const [recentCapture, setRecentCapture] = useState(null)
+
+  const handleCapture = (item) => {
+    if (!item) return
+    setCollection((prev) => (prev.some((it) => it.id === item.id) ? prev : [...prev, item]))
+    setRecentCapture(item)
+    setTimeout(() => {
+      setRecentCapture((current) => (current?.id === item.id ? null : current))
+    }, 2500)
+  }
 
   useEffect(() => {
     fetch('/gaudi.png')
@@ -218,6 +239,72 @@ export default function App() {
         </div>
       )}
 
+      {/* Notificación de captura */}
+      {recentCapture && (
+        <div style={{
+          position: 'fixed',
+          top: 80,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 35,
+          background: 'rgba(212,160,23,0.92)',
+          color: '#1a1a1a',
+          padding: '10px 22px',
+          borderRadius: 999,
+          fontSize: 14,
+          fontFamily: 'sans-serif',
+          fontWeight: 600,
+          boxShadow: '0 4px 24px rgba(255,204,51,0.4)',
+          animation: 'fadeIn 0.3s ease',
+        }}>
+          {recentCapture.icon} {recentCapture.label} añadido a tu colección
+        </div>
+      )}
+
+      {/* Colección digital */}
+      <div style={{
+        position: 'fixed',
+        top: 20,
+        right: 20,
+        zIndex: 30,
+        background: 'rgba(0,0,0,0.65)',
+        color: '#fff',
+        padding: '10px 14px',
+        borderRadius: 14,
+        fontFamily: 'sans-serif',
+        border: '1px solid rgba(255,255,255,0.16)',
+        backdropFilter: 'blur(8px)',
+        minWidth: 160,
+      }}>
+        <div style={{ fontSize: 11, opacity: 0.7, marginBottom: 8, letterSpacing: 0.6, textTransform: 'uppercase' }}>
+          Mi colección · {collection.length}
+        </div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {collection.length === 0 && (
+            <span style={{ fontSize: 12, opacity: 0.6 }}>Aún vacía</span>
+          )}
+          {collection.map((item) => (
+            <div
+              key={item.id}
+              title={item.label}
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 10,
+                background: 'rgba(255,204,51,0.18)',
+                border: '1px solid rgba(255,204,51,0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 20,
+              }}
+            >
+              {item.icon}
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* <div
         style={{
           position: 'fixed',
@@ -345,7 +432,7 @@ export default function App() {
             📷 Cámara
           </button>
         )}
-        {/* <button
+        <button
           onClick={() => store.enterAR().catch(() => alert('WebXR AR no soportado. Asegúrate de usar HTTPS.'))}
           style={{
             padding: '12px 24px', fontSize: '16px', background: '#2e6b1a',
@@ -362,7 +449,7 @@ export default function App() {
           }}
         >
           Enter VR
-        </button> */}
+        </button>
       </div>
 
       {/* Capa 3: Canvas 3D transparente encima */}
@@ -377,11 +464,15 @@ export default function App() {
         <XR store={store}>
           <Scene
             onSlabClick={handleSlabClick}
+            onCapture={handleCapture}
+            collection={collection}
             showBackground={!available}
             slabActive={tryOnActive}
             slabStatus={status}
             activeZone={activeZone}
             userPosition={userPosition}
+            decartVideoElement={outputVideoRef.current}
+            decartHasOutput={hasOutput}
           />
         </XR>
       </Canvas>
